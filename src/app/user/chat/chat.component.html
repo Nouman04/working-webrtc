@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+
+</head>
+<body>
+	<!-- The Modal -->
+<div id="myModal" class="modal">
+
+	<!-- Modal content -->
+	<div class="modal-content">
+	  <span class="close"  (click)="closeModal()">&times;</span>
+	  <h4>{{callerEmail}} <i>Calling..</i></h4>
+	  <div class="btn-group">
+		  <button class="btn btn-success" (click)="acceptVideoCall()">Accept</button>
+		  <button class="btn btn-danger">Decline</button>
+	  </div>
+	</div>
+  
+</div>
+<div id="frame">
+	<div id="sidepanel">
+		<div id="profile">
+			<div class="wrap">
+				<img id="profile-img" src="http://emilcarlsson.se/assets/mikeross.png" class="online" alt="" />
+				<p>{{this.userEmail}}</p>
+				<i class="fa fa-chevron-down expand-button" aria-hidden="true"></i>
+				<div id="status-options">
+					<ul>
+						<li id="status-online" class="active"><span class="status-circle"></span> <p>Online</p></li>
+						<li id="status-away"><span class="status-circle"></span> <p>Away</p></li>
+						<li id="status-busy"><span class="status-circle"></span> <p>Busy</p></li>
+						<li id="status-offline"><span class="status-circle"></span> <p>Offline</p></li>
+					</ul>
+				</div>
+				<div id="expanded">
+					<label for="twitter"><i class="fa fa-facebook fa-fw" aria-hidden="true"></i></label>
+					<input name="twitter" type="text" value="mikeross" />
+					<label for="twitter"><i class="fa fa-twitter fa-fw" aria-hidden="true"></i></label>
+					<input name="twitter" type="text" value="ross81" />
+					<label for="twitter"><i class="fa fa-instagram fa-fw" aria-hidden="true"></i></label>
+					<input name="twitter" type="text" value="mike.ross" />
+				</div>
+			</div>
+		</div>
+		<div id="contacts">
+			<ul >
+				<li *ngFor="let user of users" class="contact">
+					<div class="wrap">
+						<span class="contact-status {{user.status}}"></span>
+						<div class="meta">
+							<p class="name" (click)="getUserInformation($event)">{{user.email}}</p>
+						</div>
+					</div>
+				</li>
+				<!-- <li class="contact active">
+					<div class="wrap">
+						<span class="contact-status busy"></span>
+						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+						<div class="meta">
+							<p class="name">Harvey Specter</p>
+							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+						</div>
+					</div>
+				</li> -->
+			</ul>
+		</div>
+	</div>
+
+	<div class="content hide" id="content">
+		<div class="contact-profile">
+			<div class="top-bar" id="top-bar">
+				<div class="email-holder" id="email-holder">
+					<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+					<p>{{recieverEmail}}</p>
+				</div>
+				<div class="call-icons">
+					<i class="fas fa-phone fa-2x" id="audio-call" (click)="audioCall()"></i>
+					<i class="fas fa-video fa-2x" id="video-call" (click)="videoCall()"></i>
+				</div>
+			</div>
+		</div>
+		<div class="messages">
+			<ul>
+				<div>
+					<li *ngFor="let chat of conversation" class="{{chat.status}}">
+						<img src="http://emilcarlsson.se/assets/mikeross.png" alt="" />
+						<p>{{chat.msg}}</p>
+					</li>
+				</div>
+				<!--
+				<li class="replies">
+					<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+					<p>Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+				</li> -->
+			</ul>
+		</div>
+		<div class="message-input">
+			<div class="wrap">
+			<input type="text" placeholder="Write your message..." [(ngModel)]="message"/>
+			<button class="submit" (click)="sendMessage()">Send</button>
+			</div>
+		</div>
+	</div>
+	<div class="call-area hide" id="call-area">
+		<div id="local">
+			<video [autoplay]="true" [muted]="true" id="localVideo"></video>
+		</div>
+		<div id="remote">
+			<video [autoplay]="true" id="remoteVideo"></video>
+		</div>
+		<div class="ringing" *ngIf="ringingFlag == true"><h5>{{recieverEmail}} <i>Calling...</i></h5></div>
+		<div>
+			<i class="fas fa-phone fa-2x" (click)="closeVideoCall()"></i>
+			<i class="fas fa-video-slash fa-2x" (click)="toggleVideo($event)"></i>
+			<i class="fas fa-microphone-alt-slash fa-2x" (click)="toggleAudio($event)"></i>
+		</div>
+
+	</div>
+</div>
+	
+</body>
+</html>

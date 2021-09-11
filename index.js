@@ -63,7 +63,6 @@ io.on('connection',socket=>{
     })
 
     socket.on("sendCandidate",(senderEmail,recieverEmail,candidate)=>{
-        console.log(`${senderEmail} is sending candidate to ${recieverEmail}, candidate information are: ${candidate}`);
         user = socketUsers.filter(user=>{
             if(user.email == recieverEmail)
             return user;

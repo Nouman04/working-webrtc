@@ -96,7 +96,7 @@ export class ChatComponent implements OnInit {
   getUserInformation(event:any)
   {
     let p = event.target;
-    this.recieverEmail= p.innerText;
+    this.callerEmail =  this.recieverEmail= p.innerText;
     let messageArea = document.getElementById('content')!;
     messageArea?.classList.add("show");
     this.updateChat();
@@ -175,7 +175,7 @@ export class ChatComponent implements OnInit {
 
   private createPeerConnection()
   {
-    if(!this.getMediaStream)
+    if(!this.localStream)
     {
       this.getMediaStream();
     }
@@ -183,12 +183,21 @@ export class ChatComponent implements OnInit {
     this.rtc = new RTCPeerConnection(this.config);
 
     this.rtc.onicecandidate = this.handleICECandidateEvent;
-    this.rtc.oniceconnectionstatechange = this.handleICEConnectionStateChangeEvent;
+    this.rtc.onicegatheringstatechange = (event:Event)=>{
+        switch(this.rtc.iceConnectionState)
+        {
+          case 'closed':
+          case 'failed':
+          case 'disconnected':
+            this.closeVideoCall();
+            break
+        }
+    }
     
     this.rtc.ontrack = (event: RTCTrackEvent)=>{
       let remoteVideo:any= document.getElementById('remoteVideo') as HTMLVideoElement;
       remoteVideo.srcObject = event.streams[0];
-      console.log(event.streams[0]);
+      //console.log(event.streams[0]);
     }
 
     
@@ -204,45 +213,30 @@ export class ChatComponent implements OnInit {
   private handleICECandidateEvent=(event : RTCPeerConnectionIceEvent)=>{
     if(event.candidate)
     {
-      console.log(event.candidate)
-      this.webSocket.socket.emit("sendCandidate",this.userEmail,this.recieverEmail,event.candidate);
+      this.webSocket.socket.emit("sendCandidate",this.userEmail,this.callerEmail,event.candidate);
     }
   }
 
-  
-  private handleICEConnectionStateChangeEvent(event: Event){
-    switch(this.rtc.iceConnectionState)
-    {
-      case 'closed':
-      case 'failed':
-      case 'disconnected':
-        this.closeVideoCall();
-        break
-    }
-  }
-  // private handleSignalingStateChangeEvent(event: Event){
-  //   switch (this.rtc.signalingState) {
-  //     case 'closed':
-  //       this.closeVideoCall();
-  //       break;
-  //   }
-  // }
-  // private handleTrackEvent(event: RTCTrackEvent){
-  //   let remoteVideo:any= document.getElementById('remoteVideo');
-  //   remoteVideo.nativeElement.srcObject = event.streams[0];
-  // }
 
   //add ice candidate
-  private recieveCandidate()
+   private recieveCandidate()
   {
-    this.webSocket.socket.on('recieveCandidate',(candidate:RTCIceCandidate)=>{
-      const userCandidate = new RTCIceCandidate(candidate);
-      if(!this.createPeerConnection)
+    this.webSocket.socket.on('recieveCandidate',(senderEmail:any,candidate:RTCIceCandidate)=>{
+      console.log('recieving ice candidate')
+      this.callerEmail = senderEmail;
+      if(!this.localStream)
+      {
+        this.getMediaStream();
+      }
+      if(!this.rtc)
       {
         this.createPeerConnection();
       }
-      console.log(userCandidate);
-      this.rtc.addIceCandidate(userCandidate).catch(this.reportError)
+      const userCandidate = new RTCIceCandidate(candidate);
+      if(this.rtc.localDescription)
+      {
+        this.rtc.addIceCandidate(userCandidate).catch(this.reportError)
+      }
     })
   }
 
@@ -255,7 +249,7 @@ export class ChatComponent implements OnInit {
   closeVideoCall()
   {
     if (this.rtc) {
-      console.log('--> Closing the peer connection');
+      //console.log('--> Closing the peer connection');
 
       this.rtc.ontrack = null;
       this.rtc.onicecandidate = null;
@@ -301,6 +295,7 @@ export class ChatComponent implements OnInit {
   //video call
   async videoCall()
   {
+    console.log('1');
     let messageArea = document.getElementById("content")!;
     messageArea.classList.remove("show");
     let callArea = document.getElementById("call-area")!;
@@ -317,7 +312,7 @@ export class ChatComponent implements OnInit {
       this.getMediaStream();
     }
 
-    console.log(this.localStream);
+    //console.log(this.localStream);
     //set track
     this.localStream.getTracks().forEach((track:any)=>{
       this.rtc.addTrack(track,this.localStream);
@@ -397,6 +392,7 @@ private offlineUser(){
 
 private recieveVideoCall()
 {
+  console.log('2');
   this.webSocket.socket.on("recieveVideoCall",(senderEmail:any,offer:any)=>{
     this.remoteOffer = offer.data;
     this.callerEmail =  senderEmail;
@@ -447,10 +443,11 @@ this.closeModal();
 
 private recieveAnswer()
 {
+  console.log('3');
   this.ringingFlag = false;
   this.webSocket.socket.on('recieveAnswer',(answerEmail:any,info:any)=>{
   this.rtc.setRemoteDescription(info.data);
-  console.log(this.rtc)
+  //console.log(this.rtc)
   })
 }
 

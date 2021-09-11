@@ -733,6 +733,7 @@ body {
   width: 301px;
   height: 200px;
   left: 70%;
+  z-index: 1;
 }
 :host::ng-deep #remote{
   position: absolute;

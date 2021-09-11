@@ -63,19 +63,21 @@ io.on('connection',socket=>{
     })
 
     socket.on("sendCandidate",(senderEmail,recieverEmail,candidate)=>{
+        console.log(`${senderEmail} is sending candidate to ${recieverEmail}, candidate information are: ${candidate}`);
         user = socketUsers.filter(user=>{
             if(user.email == recieverEmail)
             return user;
         })
         if(user.length>0)
         {
-            io.to(user.socketID).emit("recieveCandidate",candidate);
-        }else{
+            io.to(user[0].socketID).emit("recieveCandidate",senderEmail,candidate);
+        }
+        else{
             sender = socketUsers.filter(user=>{
                 if(user.email == senderEmail)
                 return user;
             })
-            io.to(sender.socketID).emit('notAvailableUser');
+            io.to(sender[0].socketID).emit('notAvailableUser');
         }
     })
 

@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
           this.msg = "Credential Not matched";        
         }else
         {
-            this.userInfo.isLoggedIn = true;
+            this.userInfo.isLoggedIn  = true;
             this.userInfo.credentials = data;
             window.localStorage.setItem('userInformation',JSON.stringify(data))
             this.route.navigate(['/user/chat']);

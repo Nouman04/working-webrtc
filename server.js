@@ -17,7 +17,7 @@ app.use('/',require(path.join(__dirname,'./Routes/Routes.js')));
 
 const io      = require('socket.io')(server,{
     cors: {
-        origin : 'http://localhost:4200'
+        origin : 'https://working-webrtc.herokuapp.com/'
     }
 })
 socketUsers   = [];

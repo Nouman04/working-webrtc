@@ -7,7 +7,7 @@ import { io } from 'socket.io-client';
 })
 export class SocketService {
   socket: any;
-  readonly uri : string =  "https://localhost:8080";
+  readonly uri : string =  "https://working-webrtc.herokuapp.com/";
   constructor() { 
     this.socket =  io(this.uri);
   }

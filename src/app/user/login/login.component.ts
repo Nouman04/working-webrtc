@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
 
   submitLogin(){
     let data = {email :this.user.value.email, password: this.user.value.password}
-      fetch('http://localhost:3000/login',{
+      fetch('https://working-webrtc.herokuapp.com/login',{
         method: "POST",
         body:JSON.stringify(data),
         headers: {
